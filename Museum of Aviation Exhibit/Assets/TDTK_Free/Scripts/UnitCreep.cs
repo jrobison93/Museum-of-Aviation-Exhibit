@@ -21,6 +21,9 @@ namespace TDTK {
 		public List<int> valueRscMin=new List<int>();
 		public List<int> valueRscMax=new List<int>();
 		public int valueEnergyGain=0;
+
+        private Transform targetBase;
+        private NavMeshAgent nav;
 		
 		//public float flightHeight=1.5f;
 		//private Vector3 flightHeightOffset;
@@ -37,6 +40,9 @@ namespace TDTK {
 			if(thisObj.GetComponent<Collider>()==null){
 				thisObj.AddComponent<SphereCollider>();
 			}
+
+            targetBase = GameObject.FindGameObjectWithTag("Base").transform;
+            nav = GetComponent<NavMeshAgent>();
 		}
 		
 		public override void Start() {
@@ -85,15 +91,45 @@ namespace TDTK {
 		public override void FixedUpdate(){
 			base.FixedUpdate();
 			
-			if(!stunned && !dead){
+			if(!stunned && !dead)
+            {
+                nav.enabled = true;
+                nav.speed = GetMoveSpeed();
+                nav.SetDestination(targetBase.position);
+
+                /*
 				if(MoveToPoint(waypointList[waypointID])){
 					waypointID+=1;
 					if(waypointID>=path.GetPathWPCount()){
 						ReachDestination();
 					}
 				}
+                */
 			}
+            else
+            {
+                nav.enabled = false;
+            }
 		}
+
+
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.CompareTag("Base"))
+            {
+                //System.Console.WriteLine("Reached the Base");
+                dead = true;
+
+                if (onDestinationE != null) onDestinationE(this);
+
+                float delay = 0;
+                if (aniInstance != null) { delay = aniInstance.PlayDestination(); }
+
+                StartCoroutine(_ReachDestination(delay));
+            }
+
+        }
 		
 		//function call to rotate and move toward a pecific point, return true when the point is reached
 		public bool MoveToPoint(Vector3 point){
