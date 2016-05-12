@@ -356,6 +356,13 @@ namespace TDTK {
 							//newBuildInfo.availableTowerIDList=tempList;
 							
 							buildInfo=newBuildInfo;
+
+                            if (platform.tag == "Headless")
+                            {
+                                BuildTower(GetTower(platform.availableTowerIDList[0]));
+                                return _TileStatus.Unavailable;
+                            }
+
 							
 							break;
 						}
