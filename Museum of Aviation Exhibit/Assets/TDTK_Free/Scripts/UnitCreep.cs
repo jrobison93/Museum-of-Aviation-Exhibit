@@ -29,6 +29,8 @@ namespace TDTK {
 		//private Vector3 flightHeightOffset;
 		private Vector3 pathDynamicOffset;
 		public Vector3 GetPathDynamicOffset(){ return pathDynamicOffset; }
+
+        public GameObject Explosion;
 		
 		public override void Awake() {
 			SetSubClass(this);
@@ -43,7 +45,10 @@ namespace TDTK {
 
             targetBase = GameObject.FindGameObjectWithTag("Base").transform;
             nav = GetComponent<NavMeshAgent>();
-		}
+
+
+            if (Explosion != null) ObjectPoolManager.New(Explosion);
+        }
 		
 		public override void Start() {
 			base.Start();
@@ -120,6 +125,8 @@ namespace TDTK {
             {
                 //System.Console.WriteLine("Reached the Base");
                 dead = true;
+
+                if (Explosion != null) ObjectPoolManager.Spawn(Explosion, this.transform.position, Quaternion.identity);
 
                 if (onDestinationE != null) onDestinationE(this);
 
